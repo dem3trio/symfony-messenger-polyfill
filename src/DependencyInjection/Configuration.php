@@ -99,6 +99,7 @@ final class Configuration implements ConfigurationInterface
                     ->fixXmlConfig('option')
                     ->children()
                         ->scalarNode('dsn')->end()
+                        ->scalarNode('serializer')->defaultNull()->info('Service id of a custom serializer to use.')->end()
                         ->arrayNode('options')
                             ->normalizeKeys(false)
                             ->defaultValue([])
