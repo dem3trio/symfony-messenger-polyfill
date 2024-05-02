@@ -105,13 +105,15 @@ final class MessengerExtension extends ConfigurableExtension
 
         $senderAliases = [];
         foreach ($config['transports'] as $name => $transport) {
+            $serializerId = $transport['serializer'] ?? 'messenger.transport.symfony_serializer';
+
             if (0 === \strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
                 throw new \LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enabling it or running "composer require symfony/serializer-pack".');
             }
 
             $transportDefinition = (new Definition(TransportInterface::class))
                 ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
-                ->setArguments([$transport['dsn'], $transport['options']])
+                ->setArguments([$transport['dsn'], $transport['options'], new Reference($serializerId)])
                 ->addTag('messenger.receiver', ['alias' => $name]);
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);
             $senderAliases[$name] = $transportId;
@@ -152,7 +154,7 @@ final class MessengerExtension extends ConfigurableExtension
         $name = lcfirst(str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $name ?? $id))));
 
         if (!preg_match('/^[a-zA-Z_\x7f-\xff]/', $name)) {
-            throw new InvalidArgumentException(sprintf('Invalid argument name "%s" for service "%s": the first character must be a letter.', $name, $id));
+            throw new \InvalidArgumentException(sprintf('Invalid argument name "%s" for service "%s": the first character must be a letter.', $name, $id));
         }
 
         return $container->setAlias($type . ' $' . $name, $id);
