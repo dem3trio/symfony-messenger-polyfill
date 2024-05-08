@@ -105,7 +105,7 @@ final class MessengerExtension extends ConfigurableExtension
 
         $senderAliases = [];
         foreach ($config['transports'] as $name => $transport) {
-            $serializerId = $transport['serializer'] ?? 'messenger.transport.symfony_serializer';
+            $serializerId = $transport['serializer'] ?? 'messenger.transport.serializer';
 
             if (0 === \strpos($transport['dsn'], 'amqp://') && !$container->hasDefinition('messenger.transport.amqp.factory')) {
                 throw new \LogicException('The default AMQP transport is not available. Make sure you have installed and enabled the Serializer component. Try enabling it or running "composer require symfony/serializer-pack".');
